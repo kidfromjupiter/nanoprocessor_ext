@@ -16,6 +16,9 @@ set(DESIGN_SOURCES
     ${CMAKE_SOURCE_DIR}/Add_Sub_8.vhd
     ${CMAKE_SOURCE_DIR}/Reg_Bank_8.vhd
     ${CMAKE_SOURCE_DIR}/Bus_Mux_4_to_1_8.vhd
+    ${CMAKE_SOURCE_DIR}/Register_Select_Mux_8.vhd
+    ${CMAKE_SOURCE_DIR}/Seven_Seg_Hex_Display.vhd
+    ${CMAKE_SOURCE_DIR}/Manual_Clock_Controller.vhd
     ${CMAKE_SOURCE_DIR}/Program_Counter_7.vhd
     ${CMAKE_SOURCE_DIR}/Program_ROM_16.vhd
     ${CMAKE_SOURCE_DIR}/Instruction_Decoder_16.vhd
@@ -23,6 +26,7 @@ set(DESIGN_SOURCES
     ${CMAKE_SOURCE_DIR}/Microcode_ROM.vhd
     ${CMAKE_SOURCE_DIR}/Control_Unit.vhd
     ${CMAKE_SOURCE_DIR}/Nanoprocessor_Ext.vhd
+    ${CMAKE_SOURCE_DIR}/Nanoprocessor_Basys3.vhd
 )
 
 set(DESIGN_ENTITIES
@@ -31,6 +35,9 @@ set(DESIGN_ENTITIES
     Add_Sub_8
     Reg_Bank_8
     Bus_Mux_4_to_1_8
+    Register_Select_Mux_8
+    Seven_Seg_Hex_Display
+    Manual_Clock_Controller
     Program_Counter_7
     Program_ROM_16
     Instruction_Decoder_16
@@ -38,6 +45,7 @@ set(DESIGN_ENTITIES
     Microcode_ROM
     Control_Unit
     Nanoprocessor_Ext
+    Nanoprocessor_Basys3
 )
 
 add_custom_target(analyze_design
@@ -112,6 +120,9 @@ add_vhdl_testbench(RCA_8_TB ${CMAKE_SOURCE_DIR}/RCA_8_TB.vhd 300ns)
 add_vhdl_testbench(Add_Sub_8_TB ${CMAKE_SOURCE_DIR}/Add_Sub_8_TB.vhd 300ns)
 add_vhdl_testbench(Reg_Bank_8_TB ${CMAKE_SOURCE_DIR}/Reg_Bank_8_TB.vhd 600ns)
 add_vhdl_testbench(Bus_Mux_4_to_1_8_TB ${CMAKE_SOURCE_DIR}/Bus_Mux_4_to_1_8_TB.vhd 300ns)
+add_vhdl_testbench(Register_Select_Mux_8_TB ${CMAKE_SOURCE_DIR}/Register_Select_Mux_8_TB.vhd 300ns)
+add_vhdl_testbench(Seven_Seg_Hex_Display_TB ${CMAKE_SOURCE_DIR}/Seven_Seg_Hex_Display_TB.vhd 300ns)
+add_vhdl_testbench(Manual_Clock_Controller_TB ${CMAKE_SOURCE_DIR}/Manual_Clock_Controller_TB.vhd 500ns)
 add_vhdl_testbench(Program_Counter_7_TB ${CMAKE_SOURCE_DIR}/Program_Counter_7_TB.vhd 400ns)
 add_vhdl_testbench(Instruction_Decoder_16_TB ${CMAKE_SOURCE_DIR}/Instruction_Decoder_16_TB.vhd 300ns)
 add_vhdl_testbench(Nanoprocessor_Ext_TB ${CMAKE_SOURCE_DIR}/Nanoprocessor_Ext_TB.vhd 8us)

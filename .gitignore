@@ -1,1 +1,10 @@
 /build/
+/build_refactor/
+
+# Vivado generated caches and run outputs
+/nanoprocessor_ext/*.cache/
+/nanoprocessor_ext/*.hw/
+/nanoprocessor_ext/*.ip_user_files/
+/nanoprocessor_ext/*.runs/
+/nanoprocessor_ext/*.sim/
+/nanoprocessor_ext/*.srcs/utils_1/imports/
