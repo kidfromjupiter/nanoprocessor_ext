@@ -129,6 +129,8 @@ add_vhdl_testbench(Manual_Clock_Controller_TB ${CMAKE_SOURCE_DIR}/Manual_Clock_C
 add_vhdl_testbench(Program_Counter_7_TB ${CMAKE_SOURCE_DIR}/Program_Counter_7_TB.vhd 400ns)
 add_vhdl_testbench(Instruction_Decoder_16_TB ${CMAKE_SOURCE_DIR}/Instruction_Decoder_16_TB.vhd 300ns)
 add_vhdl_testbench(Nanoprocessor_Ext_TB ${CMAKE_SOURCE_DIR}/Nanoprocessor_Ext_TB.vhd 8us)
+add_vhdl_testbench(Nanoprocessor_Div_TB ${CMAKE_SOURCE_DIR}/Nanoprocessor_Div_TB.vhd 12us)
+add_vhdl_testbench(Nanoprocessor_Mul_TB ${CMAKE_SOURCE_DIR}/Nanoprocessor_Mul_TB.vhd 16us)
 
 get_property(TESTBENCH_ANALYZE_TARGETS GLOBAL PROPERTY TESTBENCH_ANALYZE_TARGETS)
 get_property(TESTBENCH_BUILD_TARGETS GLOBAL PROPERTY TESTBENCH_BUILD_TARGETS)

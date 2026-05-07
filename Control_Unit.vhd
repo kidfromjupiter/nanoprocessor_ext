@@ -11,8 +11,11 @@ entity Control_Unit is
     -- from micropc, microcode_ROM
         Micro_Addr         : in STD_LOGIC_VECTOR (MICRO_ADDR_WIDTH - 1 downto 0);
         UOp                : in STD_LOGIC_VECTOR (UOP_WIDTH - 1 downto 0);
-        Next_Mode          : in STD_LOGIC_VECTOR (1 downto 0);
+        Next_Mode          : in STD_LOGIC_VECTOR (NEXT_MODE_WIDTH - 1 downto 0);
         Next_Addr_From_ROM : in STD_LOGIC_VECTOR (MICRO_ADDR_WIDTH - 1 downto 0);
+        Micro_Src_Select   : in STD_LOGIC_VECTOR (REG_SEL_WIDTH - 1 downto 0);
+        Micro_Dst_Select   : in STD_LOGIC_VECTOR (REG_SEL_WIDTH - 1 downto 0);
+        Micro_ALU_Mode     : in STD_LOGIC_VECTOR (ALU_MODE_WIDTH - 1 downto 0);
     -- from instruction decoder
         Opcode             : in STD_LOGIC_VECTOR (OPCODE_WIDTH - 1 downto 0);
         Rd                 : in STD_LOGIC_VECTOR (REG_SEL_WIDTH - 1 downto 0);
@@ -20,8 +23,7 @@ entity Control_Unit is
         Imm_Addr           : in STD_LOGIC_VECTOR (ADDR_WIDTH - 1 downto 0);
     -- from add/sub and associated registers
         Reg_Out            : in STD_LOGIC_VECTOR (DATA_WIDTH - 1 downto 0);
-        A_Value            : in STD_LOGIC_VECTOR (DATA_WIDTH - 1 downto 0);
-        B_Value            : in STD_LOGIC_VECTOR (DATA_WIDTH - 1 downto 0);
+        ALU_Zero           : in STD_LOGIC;
     -- control signals to bus mux
         Out_A              : out STD_LOGIC;
         Out_B              : out STD_LOGIC;
@@ -50,14 +52,6 @@ entity Control_Unit is
 end Control_Unit;
 
 architecture Behavioral of Control_Unit is
-    signal Mul_Acc          : unsigned(DATA_WIDTH - 1 downto 0) := (others => '0');
-    signal Mul_Multiplicand : unsigned(DATA_WIDTH - 1 downto 0) := (others => '0');
-    signal Mul_Count        : unsigned(DATA_WIDTH - 1 downto 0) := (others => '0');
-    signal Div_Remainder    : unsigned(DATA_WIDTH - 1 downto 0) := (others => '0');
-    signal Div_Divisor      : unsigned(DATA_WIDTH - 1 downto 0) := (others => '0');
-    signal Div_Quotient     : unsigned(DATA_WIDTH - 1 downto 0) := (others => '0');
-    signal Exec_Result_Reg  : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0) := (others => '0');
-    signal Iter_Done        : STD_LOGIC := '0';
     signal Div_Zero_Reg     : STD_LOGIC := '0';
 
     function Dispatch_Entry(Op : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0)) return STD_LOGIC_VECTOR is
@@ -107,6 +101,7 @@ begin
         PC_Inc <= '0';
         PC_Load <= '0';
         PC_Target <= Imm_Addr;
+        Exec_Result <= (others => '0');
 
         case UOp is
             when UOP_LOAD_A_RD =>
@@ -143,6 +138,29 @@ begin
                 Reg_Write_Data_Sel <= WRITE_DATA_BUS;
                 PC_Inc <= '1';
 
+            when UOP_LOAD_A_MICRO_SRC =>
+                Out_Reg <= '1';
+                Out_Select <= Micro_Src_Select;
+                Load_A <= '1';
+
+            when UOP_LOAD_B_MICRO_SRC =>
+                Out_Reg <= '1';
+                Out_Select <= Micro_Src_Select;
+                Load_B <= '1';
+
+            when UOP_WRITE_ALU_MICRO_DST =>
+                Out_Add <= '1';
+                ALU_Mode <= Micro_ALU_Mode;
+                Load_Select <= Micro_Dst_Select;
+                Reg_Write <= '1';
+                Reg_Write_Data_Sel <= WRITE_DATA_BUS;
+
+            when UOP_WRITE_IMM_MICRO_DST =>
+                Load_Select <= Micro_Dst_Select;
+                Reg_Write <= '1';
+                Reg_Write_Data_Sel <= WRITE_DATA_EXEC;
+                Exec_Result <= STD_LOGIC_VECTOR(resize(unsigned(Next_Addr_From_ROM), DATA_WIDTH));
+
             when UOP_WRITE_IMM_RD =>
                 Load_Select <= Rd;
                 Reg_Write <= '1';
@@ -171,11 +189,11 @@ begin
                     PC_Inc <= '1';
                 end if;
 
-            when UOP_WRITE_EXEC_RD =>
-                Load_Select <= Rd;
-                Reg_Write <= '1';
-                Reg_Write_Data_Sel <= WRITE_DATA_EXEC;
-                PC_Inc <= '1';
+            when UOP_CLEAR_DIV_ZERO =>
+                null;
+
+            when UOP_SET_DIV_ZERO =>
+                null;
 
             when others =>
                 null;
@@ -188,11 +206,17 @@ begin
                 Micro_Next_Addr <= Next_Addr_From_ROM;
             when NEXT_DISPATCH =>
                 Micro_Next_Addr <= Dispatch_Entry(Opcode);
-            when NEXT_WAITDONE =>
-                if Iter_Done = '1' then
+            when NEXT_IF_ZERO =>
+                if ALU_Zero = '1' then
                     Micro_Next_Addr <= Next_Addr_From_ROM;
                 else
-                    Micro_Next_Addr <= Micro_Addr;
+                    Micro_Next_Addr <= STD_LOGIC_VECTOR(unsigned(Micro_Addr) + 1);
+                end if;
+            when NEXT_IF_NONZERO =>
+                if ALU_Zero = '0' then
+                    Micro_Next_Addr <= Next_Addr_From_ROM;
+                else
+                    Micro_Next_Addr <= STD_LOGIC_VECTOR(unsigned(Micro_Addr) + 1);
                 end if;
             when others =>
                 Micro_Next_Addr <= (others => '0');
@@ -203,60 +227,14 @@ begin
     begin
         -- reset pathway
         if Res = '1' then
-            Mul_Acc <= (others => '0');
-            Mul_Multiplicand <= (others => '0');
-            Mul_Count <= (others => '0');
-            Div_Remainder <= (others => '0');
-            Div_Divisor <= (others => '0');
-            Div_Quotient <= (others => '0');
-            Exec_Result_Reg <= (others => '0');
-            Iter_Done <= '0';
             Div_Zero_Reg <= '0';
         elsif rising_edge(Clk) then
             case UOp is
-                -- sync division/ multiplication. these are sync because they depend on intermediate values from registers and register 
-                -- values are updated on rising edge. The rest of the micro-ops are async since they're all combinational logic and control signals
-                when UOP_START_MUL =>
-                    Mul_Acc <= (others => '0');
-                    Mul_Multiplicand <= unsigned(A_Value);
-                    Mul_Count <= unsigned(B_Value);
-                    Exec_Result_Reg <= (others => '0');
-                    Iter_Done <= '0';
+                when UOP_CLEAR_DIV_ZERO =>
+                    Div_Zero_Reg <= '0';
 
-                when UOP_STEP_MUL =>
-                    if Mul_Count = 0 then
-                        Exec_Result_Reg <= STD_LOGIC_VECTOR(Mul_Acc);
-                        Iter_Done <= '1';
-                    else
-                        Mul_Acc <= Mul_Acc + Mul_Multiplicand;
-                        Mul_Count <= Mul_Count - 1;
-                        Iter_Done <= '0';
-                    end if;
-
-                when UOP_START_DIV =>
-                    if B_Value = x"00" then
-                        Exec_Result_Reg <= (others => '0');
-                        Div_Zero_Reg <= '1';
-                        Iter_Done <= '1';
-                    else
-                        Div_Remainder <= unsigned(A_Value);
-                        Div_Divisor <= unsigned(B_Value);
-                        Div_Quotient <= (others => '0');
-                        Div_Zero_Reg <= '0';
-                        Iter_Done <= '0';
-                    end if;
-
-                when UOP_STEP_DIV =>
-                    if Div_Zero_Reg = '1' then
-                        Iter_Done <= '1';
-                    elsif Div_Remainder >= Div_Divisor then
-                        Div_Remainder <= Div_Remainder - Div_Divisor;
-                        Div_Quotient <= Div_Quotient + 1;
-                        Iter_Done <= '0';
-                    else
-                        Exec_Result_Reg <= STD_LOGIC_VECTOR(Div_Quotient);
-                        Iter_Done <= '1';
-                    end if;
+                when UOP_SET_DIV_ZERO =>
+                    Div_Zero_Reg <= '1';
 
                 when others =>
                     null;
@@ -264,6 +242,5 @@ begin
         end if;
     end process;
 
-    Exec_Result <= Exec_Result_Reg;
     Div_Zero <= Div_Zero_Reg;
 end Behavioral;

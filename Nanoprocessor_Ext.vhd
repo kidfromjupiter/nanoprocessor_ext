@@ -36,8 +36,11 @@ architecture Structural of Nanoprocessor_Ext is
 
     signal Micro_Addr       : STD_LOGIC_VECTOR(MICRO_ADDR_WIDTH - 1 downto 0);
     signal UOp              : STD_LOGIC_VECTOR(UOP_WIDTH - 1 downto 0);
-    signal Next_Mode        : STD_LOGIC_VECTOR(1 downto 0);
+    signal Next_Mode        : STD_LOGIC_VECTOR(NEXT_MODE_WIDTH - 1 downto 0);
     signal Next_Addr_From_ROM : STD_LOGIC_VECTOR(MICRO_ADDR_WIDTH - 1 downto 0);
+    signal Micro_Src_Select : STD_LOGIC_VECTOR(REG_SEL_WIDTH - 1 downto 0);
+    signal Micro_Dst_Select : STD_LOGIC_VECTOR(REG_SEL_WIDTH - 1 downto 0);
+    signal Micro_ALU_Mode   : STD_LOGIC_VECTOR(ALU_MODE_WIDTH - 1 downto 0);
     signal Micro_Next_Addr  : STD_LOGIC_VECTOR(MICRO_ADDR_WIDTH - 1 downto 0);
 
     signal Out_A            : STD_LOGIC;
@@ -102,7 +105,10 @@ begin
             UAddr => Micro_Addr,
             UOp => UOp,
             Next_Mode => Next_Mode,
-            Next_Addr => Next_Addr_From_ROM
+            Next_Addr => Next_Addr_From_ROM,
+            Micro_Src_Select => Micro_Src_Select,
+            Micro_Dst_Select => Micro_Dst_Select,
+            Micro_ALU_Mode => Micro_ALU_Mode
         );
 
     CU: entity work.Control_Unit
@@ -113,13 +119,15 @@ begin
             UOp => UOp,
             Next_Mode => Next_Mode,
             Next_Addr_From_ROM => Next_Addr_From_ROM,
+            Micro_Src_Select => Micro_Src_Select,
+            Micro_Dst_Select => Micro_Dst_Select,
+            Micro_ALU_Mode => Micro_ALU_Mode,
             Opcode => Opcode,
             Rd => Rd,
             Rs => Rs,
             Imm_Addr => Imm_Addr,
             Reg_Out => Reg_Out_Sel,
-            A_Value => RegA_Q,
-            B_Value => RegB_Q,
+            ALU_Zero => Zero_Int,
             Out_A => Out_A,
             Out_B => Out_B,
             Out_Add => Out_Add,

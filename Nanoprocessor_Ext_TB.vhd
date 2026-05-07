@@ -46,10 +46,11 @@ begin
         assert R0_Out = x"00" report "R0 constant zero violated" severity error;
         assert R1_Out = x"05" report "Final R1 value mismatch" severity error;
         assert R2_Out = x"03" report "Final R2 value mismatch" severity error;
-        assert R3_Out = x"00" report "JZR did not skip instruction at address 14" severity error;
-        assert R4_Out = x"00" report "JNZ did not skip instruction at address 16" severity error;
-        assert R5_Out = x"01" report "CMPLT did not write true boolean result" severity error;
-        assert R6_Out = x"01" report "CMPGT did not write true boolean result" severity error;
+        assert R3_Out = x"01" report "DIV did not leave R3 as scratch constant one" severity error;
+        assert R4_Out = x"00" report "DIV final remainder scratch mismatch" severity error;
+        assert R5_Out = x"03" report "DIV divisor scratch mismatch" severity error;
+        assert R6_Out = x"05" report "DIV quotient scratch mismatch" severity error;
+        assert R7_Out = x"01" report "DIV compare scratch mismatch" severity error;
         assert Div_Zero = '0' report "Unexpected divide-by-zero flag" severity error;
         assert PC_Out = "0010001" report "Final PC expected at jump loop address 17" severity error;
 
