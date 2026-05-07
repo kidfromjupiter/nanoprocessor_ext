@@ -46,7 +46,7 @@ architecture Structural of Nanoprocessor_Ext is
     signal Out_Reg          : STD_LOGIC;
     signal Load_A           : STD_LOGIC;
     signal Load_B           : STD_LOGIC;
-    signal Add_Sub_Sel      : STD_LOGIC;
+    signal ALU_Mode         : STD_LOGIC_VECTOR(ALU_MODE_WIDTH - 1 downto 0);
     signal Out_Select       : STD_LOGIC_VECTOR(REG_SEL_WIDTH - 1 downto 0);
     signal Load_Select      : STD_LOGIC_VECTOR(REG_SEL_WIDTH - 1 downto 0);
     signal Reg_Write        : STD_LOGIC;
@@ -58,7 +58,7 @@ architecture Structural of Nanoprocessor_Ext is
     signal Reg_Data_In      : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
     signal RegA_Q           : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
     signal RegB_Q           : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
-    signal Add_Out          : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
+    signal ALU_Out          : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
     signal Overflow_Int     : STD_LOGIC;
     signal Zero_Int         : STD_LOGIC;
     signal Central_Bus      : STD_LOGIC_VECTOR(DATA_WIDTH - 1 downto 0);
@@ -126,7 +126,7 @@ begin
             Out_Reg => Out_Reg,
             Load_A => Load_A,
             Load_B => Load_B,
-            Add_Sub_Sel => Add_Sub_Sel,
+            ALU_Mode => ALU_Mode,
             Out_Select => Out_Select,
             Load_Select => Load_Select,
             Reg_Write => Reg_Write,
@@ -176,12 +176,12 @@ begin
             Q => RegB_Q
         );
 
-    AddSub: entity work.Add_Sub_8
+    ALU: entity work.ALU_8
         port map(
             A => RegA_Q,
             B => RegB_Q,
-            Add_Sub_Sel => Add_Sub_Sel,
-            S => Add_Out,
+            ALU_Mode => ALU_Mode,
+            S => ALU_Out,
             Overflow => Overflow_Int,
             Zero => Zero_Int
         );
@@ -190,7 +190,7 @@ begin
         port map(
             A_in => RegA_Q,
             B_in => RegB_Q,
-            Add_in => Add_Out,
+            Add_in => ALU_Out,
             Reg_in => Reg_Out_Sel,
             Out_A => Out_A,
             Out_B => Out_B,

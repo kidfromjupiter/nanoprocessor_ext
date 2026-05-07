@@ -18,9 +18,9 @@ end Instruction_Decoder_16;
 
 architecture Behavioral of Instruction_Decoder_16 is
 begin
-    Opcode   <= Instruction(15 downto 13);
-    Rd       <= Instruction(12 downto 10);
-    Rs       <= Instruction(9 downto 7);
+    Opcode   <= Instruction(15 downto 12);
+    Rd       <= Instruction(11 downto 9);
+    Rs       <= Instruction(8 downto 6);
     Imm_Addr <= Instruction(6 downto 0);
     Imm8     <= '0' & Instruction(6 downto 0);
 end Behavioral;

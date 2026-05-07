@@ -53,6 +53,10 @@ architecture Behavioral of Microcode_ROM is
         31 => Enc(UOP_STEP_DIV, NEXT_WAITDONE, 32),
         32 => Enc(UOP_WRITE_EXEC_RD, NEXT_ABS, 0),
 
+        36 => Enc(UOP_LOAD_A_RD, NEXT_SEQ, 0),
+        37 => Enc(UOP_LOAD_B_RS, NEXT_SEQ, 0),
+        38 => Enc(UOP_WRITE_ALU_RD, NEXT_ABS, 0),
+
         others => Enc(UOP_NOP, NEXT_ABS, 0)
     );
 

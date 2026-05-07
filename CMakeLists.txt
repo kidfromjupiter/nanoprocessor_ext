@@ -14,6 +14,7 @@ set(DESIGN_SOURCES
     ${CMAKE_SOURCE_DIR}/Reg_8.vhd
     ${CMAKE_SOURCE_DIR}/RCA_8.vhd
     ${CMAKE_SOURCE_DIR}/Add_Sub_8.vhd
+    ${CMAKE_SOURCE_DIR}/ALU_8.vhd
     ${CMAKE_SOURCE_DIR}/Reg_Bank_8.vhd
     ${CMAKE_SOURCE_DIR}/Bus_Mux_4_to_1_8.vhd
     ${CMAKE_SOURCE_DIR}/Register_Select_Mux_8.vhd
@@ -33,6 +34,7 @@ set(DESIGN_ENTITIES
     Reg_8
     RCA_8
     Add_Sub_8
+    ALU_8
     Reg_Bank_8
     Bus_Mux_4_to_1_8
     Register_Select_Mux_8
@@ -118,6 +120,7 @@ add_custom_target(build_all DEPENDS ${DESIGN_BUILD_TARGETS})
 add_vhdl_testbench(Reg_8_TB ${CMAKE_SOURCE_DIR}/Reg_8_TB.vhd 500ns)
 add_vhdl_testbench(RCA_8_TB ${CMAKE_SOURCE_DIR}/RCA_8_TB.vhd 300ns)
 add_vhdl_testbench(Add_Sub_8_TB ${CMAKE_SOURCE_DIR}/Add_Sub_8_TB.vhd 300ns)
+add_vhdl_testbench(ALU_8_TB ${CMAKE_SOURCE_DIR}/ALU_8_TB.vhd 300ns)
 add_vhdl_testbench(Reg_Bank_8_TB ${CMAKE_SOURCE_DIR}/Reg_Bank_8_TB.vhd 600ns)
 add_vhdl_testbench(Bus_Mux_4_to_1_8_TB ${CMAKE_SOURCE_DIR}/Bus_Mux_4_to_1_8_TB.vhd 300ns)
 add_vhdl_testbench(Register_Select_Mux_8_TB ${CMAKE_SOURCE_DIR}/Register_Select_Mux_8_TB.vhd 300ns)

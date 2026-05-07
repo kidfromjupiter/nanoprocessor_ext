@@ -7,20 +7,30 @@ package Nano_Config_Pkg is
     constant REG_SEL_WIDTH    : natural := 3;
     constant ADDR_WIDTH       : natural := 7;
     constant INSTR_WIDTH      : natural := 16;
-    constant OPCODE_WIDTH     : natural := 3;
+    constant OPCODE_WIDTH     : natural := 4;
     constant MICRO_ADDR_WIDTH : natural := 6;
     constant UOP_WIDTH        : natural := 5;
 
     constant MICRO_WORD_WIDTH : natural := UOP_WIDTH + 2 + MICRO_ADDR_WIDTH;
 
-    constant OPCODE_ADD  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "000";
-    constant OPCODE_MOVI : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "001";
-    constant OPCODE_SUB  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "010";
-    constant OPCODE_DIV  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "011";
-    constant OPCODE_MUL  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "100";
-    constant OPCODE_JMP  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "101";
-    constant OPCODE_JZR  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "110";
-    constant OPCODE_JNZ  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "111";
+    constant OPCODE_ADD   : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0000";
+    constant OPCODE_MOVI  : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0001";
+    constant OPCODE_SUB   : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0010";
+    constant OPCODE_DIV   : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0011";
+    constant OPCODE_MUL   : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0100";
+    constant OPCODE_JMP   : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0101";
+    constant OPCODE_JZR   : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0110";
+    constant OPCODE_JNZ   : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "0111";
+    constant OPCODE_CMPEQ : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "1000";
+    constant OPCODE_CMPLT : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "1001";
+    constant OPCODE_CMPGT : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0) := "1010";
+
+    constant ALU_MODE_WIDTH : natural := 3;
+    constant ALU_MODE_ADD   : STD_LOGIC_VECTOR(ALU_MODE_WIDTH - 1 downto 0) := "000";
+    constant ALU_MODE_SUB   : STD_LOGIC_VECTOR(ALU_MODE_WIDTH - 1 downto 0) := "001";
+    constant ALU_MODE_CMPEQ : STD_LOGIC_VECTOR(ALU_MODE_WIDTH - 1 downto 0) := "010";
+    constant ALU_MODE_CMPLT : STD_LOGIC_VECTOR(ALU_MODE_WIDTH - 1 downto 0) := "011";
+    constant ALU_MODE_CMPGT : STD_LOGIC_VECTOR(ALU_MODE_WIDTH - 1 downto 0) := "100";
 
     constant NEXT_SEQ      : STD_LOGIC_VECTOR(1 downto 0) := "00";
     constant NEXT_ABS      : STD_LOGIC_VECTOR(1 downto 0) := "01";
@@ -41,6 +51,7 @@ package Nano_Config_Pkg is
     constant UOP_START_DIV     : STD_LOGIC_VECTOR(UOP_WIDTH - 1 downto 0) := "01011";
     constant UOP_STEP_DIV      : STD_LOGIC_VECTOR(UOP_WIDTH - 1 downto 0) := "01100";
     constant UOP_WRITE_EXEC_RD : STD_LOGIC_VECTOR(UOP_WIDTH - 1 downto 0) := "01101";
+    constant UOP_WRITE_ALU_RD  : STD_LOGIC_VECTOR(UOP_WIDTH - 1 downto 0) := "01110";
 
     constant ENTRY_ADD  : natural := 4;
     constant ENTRY_SUB  : natural := 8;
@@ -50,6 +61,7 @@ package Nano_Config_Pkg is
     constant ENTRY_JNZ  : natural := 18;
     constant ENTRY_MUL  : natural := 20;
     constant ENTRY_DIV  : natural := 28;
+    constant ENTRY_CMP  : natural := 36;
 
     constant WRITE_DATA_BUS  : STD_LOGIC_VECTOR(1 downto 0) := "00";
     constant WRITE_DATA_IMM  : STD_LOGIC_VECTOR(1 downto 0) := "01";

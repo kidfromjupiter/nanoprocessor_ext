@@ -30,8 +30,8 @@ entity Control_Unit is
     -- control for A/B registers
         Load_A             : out STD_LOGIC;
         Load_B             : out STD_LOGIC;
-    -- control for add/sub
-        Add_Sub_Sel        : out STD_LOGIC;
+    -- control for ALU
+        ALU_Mode           : out STD_LOGIC_VECTOR (ALU_MODE_WIDTH - 1 downto 0);
     -- to reg bank
         Out_Select         : out STD_LOGIC_VECTOR (REG_SEL_WIDTH - 1 downto 0);
         Load_Select        : out STD_LOGIC_VECTOR (REG_SEL_WIDTH - 1 downto 0);
@@ -72,7 +72,21 @@ architecture Behavioral of Control_Unit is
             when OPCODE_JNZ  => return STD_LOGIC_VECTOR(to_unsigned(ENTRY_JNZ, MICRO_ADDR_WIDTH));
             when OPCODE_MUL  => return STD_LOGIC_VECTOR(to_unsigned(ENTRY_MUL, MICRO_ADDR_WIDTH));
             when OPCODE_DIV  => return STD_LOGIC_VECTOR(to_unsigned(ENTRY_DIV, MICRO_ADDR_WIDTH));
+            when OPCODE_CMPEQ => return STD_LOGIC_VECTOR(to_unsigned(ENTRY_CMP, MICRO_ADDR_WIDTH));
+            when OPCODE_CMPLT => return STD_LOGIC_VECTOR(to_unsigned(ENTRY_CMP, MICRO_ADDR_WIDTH));
+            when OPCODE_CMPGT => return STD_LOGIC_VECTOR(to_unsigned(ENTRY_CMP, MICRO_ADDR_WIDTH));
             when others      => return STD_LOGIC_VECTOR(to_unsigned(0, MICRO_ADDR_WIDTH));
+        end case;
+    end function;
+
+    function ALU_Mode_For_Opcode(Op : STD_LOGIC_VECTOR(OPCODE_WIDTH - 1 downto 0)) return STD_LOGIC_VECTOR is
+    begin
+        case Op is
+            when OPCODE_SUB   => return ALU_MODE_SUB;
+            when OPCODE_CMPEQ => return ALU_MODE_CMPEQ;
+            when OPCODE_CMPLT => return ALU_MODE_CMPLT;
+            when OPCODE_CMPGT => return ALU_MODE_CMPGT;
+            when others       => return ALU_MODE_ADD;
         end case;
     end function;
 begin
@@ -85,7 +99,7 @@ begin
         Out_Reg <= '0';
         Load_A <= '0';
         Load_B <= '0';
-        Add_Sub_Sel <= '0';
+        ALU_Mode <= ALU_MODE_ADD;
         Out_Select <= Rd;
         Load_Select <= Rd;
         Reg_Write <= '0';
@@ -107,7 +121,7 @@ begin
 
             when UOP_WRITE_ADD_RD =>
                 Out_Add <= '1';
-                Add_Sub_Sel <= '0';
+                ALU_Mode <= ALU_MODE_ADD;
                 Load_Select <= Rd;
                 Reg_Write <= '1';
                 Reg_Write_Data_Sel <= WRITE_DATA_BUS;
@@ -115,7 +129,15 @@ begin
 
             when UOP_WRITE_SUB_RD =>
                 Out_Add <= '1';
-                Add_Sub_Sel <= '1';
+                ALU_Mode <= ALU_MODE_SUB;
+                Load_Select <= Rd;
+                Reg_Write <= '1';
+                Reg_Write_Data_Sel <= WRITE_DATA_BUS;
+                PC_Inc <= '1';
+
+            when UOP_WRITE_ALU_RD =>
+                Out_Add <= '1';
+                ALU_Mode <= ALU_Mode_For_Opcode(Opcode);
                 Load_Select <= Rd;
                 Reg_Write <= '1';
                 Reg_Write_Data_Sel <= WRITE_DATA_BUS;
