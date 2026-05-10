@@ -15,7 +15,8 @@ architecture Behavioral of Manual_Clock_Controller_TB is
 begin
     UUT: entity work.Manual_Clock_Controller
         generic map(
-            DEBOUNCE_CYCLES => 2
+            DEBOUNCE_CYCLES => 2,
+            AUTO_HALF_PERIOD_CYCLES => 3
         )
         port map(
             Sys_Clk => Sys_Clk,
@@ -41,16 +42,16 @@ begin
     process
         variable Start_Count : integer;
     begin
-        wait for 25 ns;
+        wait for 27 ns;
         Res <= '0';
 
         Manual_Mode <= '0';
-        wait until Sys_Clk = '0';
-        wait for 1 ns;
-        assert Cpu_Clk = '0' report "Auto mode should pass low clock level" severity error;
-        wait until Sys_Clk = '1';
-        wait for 1 ns;
-        assert Cpu_Clk = '1' report "Auto mode should pass high clock level" severity error;
+        wait for 20 ns;
+        assert Cpu_Clk = '0' report "Auto mode should hold divided clock low before half period" severity error;
+        wait for 20 ns;
+        assert Cpu_Clk = '1' report "Auto mode should toggle divided clock after half period" severity error;
+        wait for 30 ns;
+        assert Cpu_Clk = '0' report "Auto mode should toggle divided clock after full half period" severity error;
 
         Manual_Mode <= '1';
         wait until Sys_Clk = '0';

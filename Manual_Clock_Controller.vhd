@@ -4,7 +4,8 @@ use IEEE.NUMERIC_STD.ALL;
 
 entity Manual_Clock_Controller is
     Generic (
-        DEBOUNCE_CYCLES : natural := 1000000
+        DEBOUNCE_CYCLES : natural := 1000000;
+        AUTO_HALF_PERIOD_CYCLES : positive := 50000000
     );
     Port (
         Sys_Clk     : in STD_LOGIC;
@@ -22,6 +23,8 @@ architecture Behavioral of Manual_Clock_Controller is
     signal Button_Prev    : STD_LOGIC := '0';
     signal Step_Pulse     : STD_LOGIC := '0';
     signal Debounce_Count : natural range 0 to DEBOUNCE_CYCLES := 0;
+    signal Auto_Clk       : STD_LOGIC := '0';
+    signal Auto_Count     : natural range 0 to AUTO_HALF_PERIOD_CYCLES - 1 := 0;
 begin
     process(Sys_Clk, Res)
     begin
@@ -32,7 +35,16 @@ begin
             Button_Prev <= '0';
             Step_Pulse <= '0';
             Debounce_Count <= 0;
+            Auto_Clk <= '0';
+            Auto_Count <= 0;
         elsif rising_edge(Sys_Clk) then
+            if Auto_Count = AUTO_HALF_PERIOD_CYCLES - 1 then
+                Auto_Count <= 0;
+                Auto_Clk <= not Auto_Clk;
+            else
+                Auto_Count <= Auto_Count + 1;
+            end if;
+
             Button_Sync_0 <= Step_Button;
             Button_Sync_1 <= Button_Sync_0;
             Step_Pulse <= '0';
@@ -53,5 +65,5 @@ begin
         end if;
     end process;
 
-    Cpu_Clk <= Sys_Clk when Manual_Mode = '0' else Step_Pulse;
+    Cpu_Clk <= Auto_Clk when Manual_Mode = '0' else Step_Pulse;
 end Behavioral;
